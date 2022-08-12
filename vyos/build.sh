@@ -2,10 +2,6 @@
 
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt install -y packer
-
-pwd
-
-cd /home/runner/work/packer/packer
+apt install -y packer qemu-system-x86 qemu-utils
 
 packer build -debug vyos/vyos.json

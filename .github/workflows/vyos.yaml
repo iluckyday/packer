@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Build clab.img
+      - name: Build vyos.img
         run: sudo /bin/bash vyos/build.sh
 
       - name: Push to transfer
