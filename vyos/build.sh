@@ -4,4 +4,8 @@ export DEBIAN_FRONTEND=noninteractive
 apt update
 apt install -y packer
 
-packer build -debug vyos.json
+pwd
+
+cd /home/runner/work/packer/packer
+
+packer build -debug vyos/vyos.json
