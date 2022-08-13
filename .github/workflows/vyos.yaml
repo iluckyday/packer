@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
 
@@ -21,4 +21,4 @@ jobs:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
         run: |
-          bash transfer.sh wet /tmp/vyos-*.img
+          bash transfer.sh wet /tmp/output-vyos-rolling-amd64/vyos-*.img
