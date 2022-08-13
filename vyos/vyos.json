@@ -11,7 +11,7 @@
 			"vm_name": "vyos-{{isotime `20060102`}}.img",
 			"disk_size": "20000",
 			"disk_compression": true,
-			"boot_wait": "3m",
+			"boot_wait": "10m",
 			"boot_command": [
 				"vyos<enter><wait5>",
 				"vyos<enter><wait10>",
@@ -27,7 +27,7 @@
 				"vyos<enter><wait5>",
 				"<enter><wait10>",
 				"reboot<enter><wait5>",
-				"Yes<enter><wait3m>",
+				"Yes<enter><wait10m>",
 				"vyos<enter><wait5>",
 				"vyos<enter><wait10>",
 				"configure<enter><wait5>",
