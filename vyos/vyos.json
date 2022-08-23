@@ -12,6 +12,11 @@
 			"disk_size": "20000",
 			"disk_compression": true,
 			"boot_wait": "10m",
+			"communicator": "ssh",
+			"ssh_timeout": "2m",
+			"ssh_username": "vyos",
+			"ssh_password": "vyos",
+			"shutdown_command": "sudo shutdown -h now"
 			"boot_command": [
 				"vyos<enter><wait5>",
 				"vyos<enter><wait10>",
@@ -26,7 +31,11 @@
 				"vyos<enter><wait5>",
 				"vyos<enter><wait5>",
 				"<enter><wait10>",
-			        "sudo shutdown -h now<enter>"
+				"configure<enter><wait5>",
+				"set interfaces ethernet eth0 address dhcp<enter><wait5>",
+				"set service ssh<enter><wait5>",
+				"<wait5>",
+				"commit<enter><wait10>"
 			]
 		}
 	]
