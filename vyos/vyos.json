@@ -16,7 +16,7 @@
 			"ssh_timeout": "2m",
 			"ssh_username": "vyos",
 			"ssh_password": "vyos",
-			"shutdown_command": "sudo shutdown -h now"
+			"shutdown_command": "sudo shutdown -h now",
 			"boot_command": [
 				"vyos<enter><wait5>",
 				"vyos<enter><wait10>",
