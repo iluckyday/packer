@@ -3,7 +3,7 @@
 			"type": "qemu",
 			"cpus": 2,
 			"memory": 2048,
-			"net_device": "virtio-net",
+			"net_device": "ne2k_pci",
 			"headless": "true",
 			"iso_url": "https://s3-us.vyos.io/rolling/current/vyos-rolling-latest.iso",
 			"iso_checksum": "none",
