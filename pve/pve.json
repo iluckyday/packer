@@ -24,7 +24,7 @@
 				"China<wait><enter><wait><leftAltOn>n<leftAltOff><wait5>",
 				"proxmox<wait5><tab>proxmox<wait5><tab>mail@example.com<wait><leftAltOn>n<leftAltOff><wait5>",
 				"pve.example.com<wait><leftAltOn>n<leftAltOff><wait5>",
-				"<leftAltOn>i<leftAltOff><wait10m>"
+				"<leftAltOn>i<leftAltOff><wait20m>"
 			]
 		}
 	]
