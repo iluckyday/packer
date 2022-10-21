@@ -1,0 +1,31 @@
+{
+	"builders": [{
+			"type": "qemu",
+			"accelerator": "tcg",
+			"qemuargs": [
+				[ "-no-reboot", "" ]
+			],
+			"cpus": XCPUSX,
+			"memory": 2048,
+			"headless": "true",
+			"iso_url": "XPVEURLX",
+			"iso_checksum": "none",
+			"output_directory": "/tmp/output-pve",
+			"vm_name": "pve-XPVEVERX.img",
+			"disk_size": "200000",
+			"disk_compression": true,
+			"boot_wait": "10s",
+			"communicator": "none",
+			"boot_command": [
+				"<enter><wait5m>",
+				"<leftAltOn>g<leftAltOff><wait10>",
+				"<leftAltOn>o<leftAltOff><wait5><tab><wait5><tab><wait5>0<wait><leftAltOn>o<leftAltOff><wait5>",
+				"<leftAltOn>n<leftAltOff><wait5>",
+				"China<wait><enter><wait><leftAltOn>n<leftAltOff><wait5>",
+				"proxmox<wait5><tab>proxmox<wait5><tab>mail@example.com<wait><leftAltOn>n<leftAltOff><wait5>",
+				"pve.example.com<wait><leftAltOn>n<leftAltOff><wait5>",
+				"<leftAltOn>i<leftAltOff><wait10m>"
+			]
+		}
+	]
+}
