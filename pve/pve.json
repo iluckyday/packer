@@ -16,15 +16,16 @@
 			"disk_compression": true,
 			"boot_wait": "10s",
 			"communicator": "none",
+			"shutdown_timeout": "2h",
 			"boot_command": [
 				"<enter><wait5m>",
 				"<leftAltOn>g<leftAltOff><wait10>",
-				"<leftAltOn>o<leftAltOff><wait5><tab><wait5><tab><wait5>0<wait><leftAltOn>o<leftAltOff><wait5>",
-				"<leftAltOn>n<leftAltOff><wait5>",
-				"China<wait><enter><wait><leftAltOn>n<leftAltOff><wait5>",
-				"proxmox<wait5><tab>proxmox<wait5><tab>mail@example.com<wait><leftAltOn>n<leftAltOff><wait5>",
-				"pve.example.com<wait><leftAltOn>n<leftAltOff><wait5>",
-				"<leftAltOn>i<leftAltOff><wait20m>"
+				"<leftAltOn>o<leftAltOff><wait5><tab><wait5><tab><wait5>0<wait><leftAltOn>o<leftAltOff><wait10>",
+				"<leftAltOn>n<leftAltOff><wait10>",
+				"China<wait><enter><wait><leftAltOn>n<leftAltOff><wait10>",
+				"proxmox<wait5><tab>proxmox<wait5><tab>mail@example.com<wait><leftAltOn>n<leftAltOff><wait10>",
+				"pve.example.com<wait><leftAltOn>n<leftAltOff><wait10>",
+				"<leftAltOn>i<leftAltOff>"
 			]
 		}
 	]
