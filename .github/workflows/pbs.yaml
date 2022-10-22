@@ -1,0 +1,24 @@
+name: pbs.img
+
+on:
+  schedule:
+    - cron:  "0 0 * * 0"
+  push:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Build pbs.img
+        run: sudo /bin/bash pbs/build.sh
+
+      - name: Push to transfer
+        env:
+          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
+          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
+        run: |
+          bash transfer.sh wet /tmp/output-pbs/pbs-*.img

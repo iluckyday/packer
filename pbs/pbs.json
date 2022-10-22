@@ -8,10 +8,10 @@
 			"cpus": XCPUSX,
 			"memory": 2048,
 			"headless": "true",
-			"iso_url": "XPVEURLX",
+			"iso_url": "XPBSURLX",
 			"iso_checksum": "none",
-			"output_directory": "/tmp/output-pve",
-			"vm_name": "pve-XPVEVERX.img",
+			"output_directory": "/tmp/output-pbs",
+			"vm_name": "pbs-XPBSVERX.img",
 			"disk_size": "1000000",
 			"disk_compression": true,
 			"boot_wait": "10s",
@@ -24,7 +24,7 @@
 				"<leftAltOn>n<leftAltOff><wait10>",
 				"China<wait><enter><wait><leftAltOn>n<leftAltOff><wait10>",
 				"proxmox<wait5><tab>proxmox<wait5><tab>mail@example.com<wait><leftAltOn>n<leftAltOff><wait10>",
-				"pve.example.com<wait><leftAltOn>n<leftAltOff><wait10>",
+				"pbs.example.com<wait><leftAltOn>n<leftAltOff><wait10>",
 				"<leftAltOn>i<leftAltOff>"
 			]
 		}
