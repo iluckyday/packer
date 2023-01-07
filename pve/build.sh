@@ -13,6 +13,10 @@ CPUS=$(nproc)
 rm -rf /tmp/output-pve /pve
 sed -e "s/XPVEVERX/$PVEVER/" -e "s|XPVEURLX|$PVEURL|" -e "s/XCPUSX/$CPUS/" pve/pve.json | packer build -
 
+free -h
+df -h
+ls -lh /tmp/output-pve
+
 echo install pve ceph
 systemd-run -G --unit qemu-pve.service qemu-system-x86_64 -machine pc,accel=kvm:hax:hvf:whpx:tcg -cpu kvm64 -smp "$(nproc)" -m 2G -netdev user,id=n0,ipv6=off,hostfwd=tcp:127.0.0.1:22222-:22 -device virtio-net,netdev=n0,addr=0x03 -display none -object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0 -boot c -drive file=/tmp/output-pve/pve-${PVEVER}.raw,if=virtio,format=raw,media=disk
 
