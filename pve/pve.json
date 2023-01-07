@@ -12,7 +12,7 @@
 			"iso_checksum": "none",
 			"output_directory": "/tmp/output-pve",
 			"vm_name": "pve-XPVEVERX.raw",
-			"disk_size": "5120",
+			"disk_size": "20480",
 			"disk_compression": false,
 			"format": "raw",
 			"boot_wait": "10s",
@@ -20,6 +20,7 @@
 			"shutdown_timeout": "2h",
 			"boot_command": [
 				"<enter><wait5m>",
+				"<enter><wait10>",
 				"<leftAltOn>g<leftAltOff><wait10>",
 				"<leftAltOn>o<leftAltOff><wait5><tab><wait5><tab><wait5>0<wait><leftAltOn>o<leftAltOff><wait10>",
 				"<leftAltOn>n<leftAltOff><wait10>",

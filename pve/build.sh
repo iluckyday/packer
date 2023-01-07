@@ -15,6 +15,7 @@ sed -e "s/XPVEVERX/$PVEVER/" -e "s|XPVEURLX|$PVEURL|" -e "s/XCPUSX/$CPUS/" pve/p
 
 free -h
 df -h
+df -h /tmp
 ls -lh /tmp/output-pve
 
 echo install pve ceph
@@ -129,6 +130,8 @@ rm -rf ${mount_dir}/etc/hostname \
 find ${mount_dir}/usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'locale-archive' -prune -exec rm -rf {} +
 find ${mount_dir}/usr -type d -name __pycache__ -prune -exec rm -rf {} +
 
+sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
+
 sync ${mount_dir}
 umount ${mount_dir}
 sleep 1
@@ -138,4 +141,4 @@ losetup -d $loopx
 
 sleep 1
 #qemu-img convert -c -f raw -O qcow2 /tmp/output-pve/pve-${PVEVER}.raw /tmp/output-pve/pve-${PVEVER}.img
-virt-sparsify -x -v --compress --convert qcow2 /tmp/output-pve/pve-${PVEVER}.raw /tmp/output-pve/pve-${PVEVER}.img
+virt-sparsify -x -v --check-tmpdir ignore --compress --format raw --convert qcow2 /tmp/output-pve/pve-${PVEVER}.raw /tmp/output-pve/pve-${PVEVER}.img
