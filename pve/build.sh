@@ -56,11 +56,12 @@ mount_dir=/pve
 cat << EOF >> ${mount_dir}/etc/fstab
 tmpfs             /run                    tmpfs defaults,size=90%     0 0
 tmpfs             /tmp                    tmpfs mode=1777,size=90%    0 0
-tmpfs             /var/log                tmpfs defaults,noatime      0 0
 tmpfs             /root/.cache            tmpfs   rw,relatime         0 0
 EOF
 
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/etc/pve/priv/authorized_keys
+mkdir -p ${mount_dir}/root/.ssh
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/root/.ssh/authorized_keys2
+chmod 600 ${mount_dir}/root/.ssh/authorized_keys2
 
 mkdir -p ${mount_dir}/etc/apt/apt.conf.d
 cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99-freedisk
@@ -115,22 +116,146 @@ export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 export PYTHONDONTWRITEBYTECODE=1 PYTHONSTARTUP=/usr/lib/pythonstartup
 EOF
 
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/logrotate.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/man-db.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_all.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily-upgrade.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/fstrim.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/chrony.service
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/cron.service
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
+
+sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
+
+echo clean ...
 rm -rf ${mount_dir}/etc/hostname \
        ${mount_dir}/etc/localtime \
        ${mount_dir}/usr/share/doc \
        ${mount_dir}/usr/share/man \
        ${mount_dir}/tmp/* \
-       ${mount_dir}/var/log/* \
        ${mount_dir}/var/tmp/* \
        ${mount_dir}/var/cache/apt/* \
+       ${mount_dir}/var/cache/man/* \
+       ${mount_dir}/var/cache/proxmox-backup/* \
+       ${mount_dir}/var/cache/debconf/* \
        ${mount_dir}/var/lib/apt/lists/* \
        ${mount_dir}/usr/bin/systemd-analyze \
-       ${mount_dir}/lib/modules/*/kernel/drivers/net/ethernet/* \
        ${mount_dir}/boot/System.map-*
+rm -rf ${mount_dir}/usr/lib/firmware
+
+DELETE_MODULES="
+fs/udf
+fs/adfs
+fs/affs
+fs/ocfs2
+fs/jfs
+fs/ubifs
+fs/gfs2
+fs/cifs
+fs/befs
+fs/erofs
+fs/hpfs
+fs/f2fs
+fs/xfs
+fs/freevxfs
+fs/hfsplus
+fs/minix
+fs/coda
+fs/dlm
+fs/afs
+fs/omfs
+fs/reiserfs
+fs/bfs
+fs/qnx6
+fs/nilfs2
+fs/jbd2
+fs/efs
+fs/hfs
+fs/jffs2
+fs/orangefs
+fs/ufs
+net/wireless
+net/mpls
+net/wimax
+net/l2tp
+net/nfc
+net/tipc
+net/appletalk
+net/rds
+net/dccp
+net/netrom
+net/lapb
+net/mac80211
+net/6lowpan
+net/sunrpc
+net/rxrpc
+net/atm
+net/psample
+net/rose
+net/ax25
+net/bluetooth
+net/ife
+net/phonet
+drivers/media
+drivers/mfd
+drivers/hid
+drivers/nfc
+drivers/dca
+drivers/thunderbolt
+drivers/firmware
+drivers/xen
+drivers/spi
+drivers/i2c
+drivers/uio
+drivers/hv
+drivers/ptp
+drivers/pcmcia
+drivers/isdn
+drivers/atm
+drivers/w1
+drivers/hwmon
+drivers/dax
+drivers/parport
+drivers/ssb
+drivers/infiniband
+drivers/gpu
+drivers/bluetooth
+drivers/video
+drivers/android
+drivers/nvme
+drivers/gnss
+drivers/firewire
+drivers/leds
+drivers/net/fddi
+drivers/net/hyperv
+drivers/net/xen-netback
+drivers/net/wireless
+drivers/net/slip
+drivers/net/usb
+drivers/net/team
+drivers/net/ppp
+drivers/net/can
+drivers/net/phy
+drivers/net/ieee802154
+drivers/net/fjes
+drivers/net/hippi
+drivers/net/wan
+drivers/net/plip
+drivers/net/appletalk
+drivers/net/wimax
+drivers/net/arcnet
+drivers/net/hamradio
+drivers/net/ethernet
+sound
+"
+for m in $DELETE_MODULES; do
+	rm -rf ${mount_dir}/lib/modules/*/kernel/$m
+done
+
 find ${mount_dir}/usr/*/locale -mindepth 1 -maxdepth 1 ! -name 'locale-archive' -prune -exec rm -rf {} +
 find ${mount_dir}/usr -type d -name __pycache__ -prune -exec rm -rf {} +
-
-sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
+find ${mount_dir}/var/log -type f -delete
 
 sync ${mount_dir}
 umount ${mount_dir}
