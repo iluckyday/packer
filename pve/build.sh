@@ -34,7 +34,7 @@ sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nu
 ip address show
 ip route
 cat /etc/resolv.conf
-pveceph install
+echo y | pveceph install
 poweroff
 CMD
 
@@ -55,9 +55,7 @@ tmpfs             /var/log                tmpfs defaults,noatime      0 0
 tmpfs             /root/.cache            tmpfs   rw,relatime         0 0
 EOF
 
-mkdir -p ${mount_dir}/root/.ssh
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/root/.ssh/authorized_keys
-chmod 600 ${mount_dir}/root/.ssh/authorized_keys
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyuzRtZAyeU3VGDKsGk52rd7b/rJ/EnT8Ce2hwWOZWp" >> ${mount_dir}/etc/pve/priv/authorized_keys
 
 mkdir -p ${mount_dir}/etc/apt/apt.conf.d
 cat << EOF > ${mount_dir}/etc/apt/apt.conf.d/99-freedisk
