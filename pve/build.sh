@@ -19,6 +19,64 @@ df -h
 df -h /tmp
 ls -lh /tmp/output-pve
 
+sleep 10
+echo for pveceph ...
+loopx=$(losetup --show -f -P /tmp/output-pve/pve-${PVEVER}.raw)
+
+vgscan
+vgchange -a y
+mkdir -p /pve
+mount /dev/pve/root /pve
+mount_dir=/pve
+
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/logrotate.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/man-db.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_all.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily-upgrade.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/fstrim.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/chrony.service
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/cron.service
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
+
+sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
+
+rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service
+
+sync ${mount_dir}
+umount ${mount_dir}
+sleep 1
+vgchange -a n
+sleep 1
+losetup -d $loopx
+
+echo install pve ceph
+systemd-run -G --unit qemu-pve.service qemu-system-x86_64 -machine pc,accel=kvm:hax:hvf:whpx:tcg -cpu kvm64 -smp "$(nproc)" -m 2G -netdev user,id=n0,ipv6=off,hostfwd=tcp:127.0.0.1:22222-:22 -device virtio-net,netdev=n0,addr=0x0a -display none -object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0 -boot c -drive file=/tmp/output-pve/pve-${PVEVER}.raw,if=virtio,format=raw,media=disk
+
+sleep 10
+while true
+do
+	sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -l root 127.0.0.1 'exit 0'
+	RCODE=$?
+	if [ $RCODE -ne 0 ]; then
+		echo "[!] SSH is not available."
+		sleep 2
+	else
+		sleep 2
+		break
+	fi
+done
+
+sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -l root 127.0.0.1 bash -sx << "CMD"
+/usr/bin/pmxcfs -l
+sleep 3
+echo y | /usr/bin/pveceph install
+sleep 1
+poweroff
+CMD
+
 sleep 300
 echo custom ...
 loopx=$(losetup --show -f -P /tmp/output-pve/pve-${PVEVER}.raw)
@@ -28,10 +86,6 @@ vgchange -a y
 mkdir -p /pve
 mount /dev/pve/root /pve
 mount_dir=/pve
-
-chroot ${mount_dir} /bin/bash -c "
-echo y | pveceph install
-"
 
 cat << EOF >> ${mount_dir}/etc/fstab
 tmpfs             /run                    tmpfs defaults,size=90%     0 0
@@ -96,22 +150,7 @@ export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 export PYTHONDONTWRITEBYTECODE=1 PYTHONSTARTUP=/usr/lib/pythonstartup
 EOF
 
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/logrotate.timer
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/man-db.timer
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily.timer
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_all.timer
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily-upgrade.timer
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/fstrim.timer
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/chrony.service
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/cron.service
-ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
-
-sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
 sed -i '/example/d' ${mount_dir}/etc/hosts
-
-rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
-       ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
-       ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service
 
 echo clean ...
 rm -rf ${mount_dir}/etc/hostname \
@@ -173,7 +212,6 @@ net/netrom
 net/lapb
 net/mac80211
 net/6lowpan
-net/sunrpc
 net/rxrpc
 net/atm
 net/psample
@@ -201,9 +239,7 @@ drivers/atm
 drivers/w1
 drivers/hwmon
 drivers/dax
-drivers/parport
 drivers/ssb
-drivers/infiniband
 drivers/gpu
 drivers/bluetooth
 drivers/video
