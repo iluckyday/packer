@@ -12,36 +12,12 @@ CPUS=$(nproc)
 
 rm -rf /tmp/output-pve /pve
 sed -e "s/XPVEVERX/$PVEVER/" -e "s|XPVEURLX|$PVEURL|" -e "s/XCPUSX/$CPUS/" pve/pve.json | packer build -
+# qemu-img convert -c -f raw -O qcow2 /tmp/output-pve/pve-${PVEVER}.raw /tmp/output-pve/pve-orig-${PVEVER}.img
 
 free -h
 df -h
 df -h /tmp
 ls -lh /tmp/output-pve
-
-echo install pve ceph
-systemd-run -G --unit qemu-pve.service qemu-system-x86_64 -machine pc,accel=kvm:hax:hvf:whpx:tcg -cpu kvm64 -smp "$(nproc)" -m 2G -netdev user,id=n0,ipv6=off,hostfwd=tcp:127.0.0.1:22222-:22 -device virtio-net,netdev=n0,addr=0x03 -display none -object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0 -boot c -drive file=/tmp/output-pve/pve-${PVEVER}.raw,if=virtio,format=raw,media=disk
-
-sleep 10
-while true
-do
-	sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -l root 127.0.0.1 'exit 0'
-	RCODE=$?
-	if [ $RCODE -ne 0 ]; then
-		echo "[!] SSH is not available."
-		sleep 2
-	else
-		sleep 2
-		break
-	fi
-done
-
-sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -l root 127.0.0.1 bash -sx << "CMD"
-ip address show
-ip route
-cat /etc/resolv.conf
-echo y | pveceph install
-poweroff
-CMD
 
 sleep 300
 echo custom ...
@@ -52,6 +28,10 @@ vgchange -a y
 mkdir -p /pve
 mount /dev/pve/root /pve
 mount_dir=/pve
+
+chroot ${mount_dir} /bin/bash -c "
+echo y | pveceph install
+"
 
 cat << EOF >> ${mount_dir}/etc/fstab
 tmpfs             /run                    tmpfs defaults,size=90%     0 0
@@ -127,6 +107,11 @@ ln -sf /dev/null ${mount_dir}/etc/systemd/system/cron.service
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
 
 sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
+sed -i '/example/d' ${mount_dir}/etc/hosts
+
+rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service
 
 echo clean ...
 rm -rf ${mount_dir}/etc/hostname \
