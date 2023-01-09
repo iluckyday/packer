@@ -43,7 +43,8 @@ sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/
 
 rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
-       ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service \
+       ${mount_dir}/etc/systemd/system/pve-manager.service
 
 sync ${mount_dir}
 umount ${mount_dir}
@@ -150,7 +151,13 @@ export HISTSIZE=1000 LESSHISTFILE=/dev/null HISTFILE=/dev/null
 export PYTHONDONTWRITEBYTECODE=1 PYTHONSTARTUP=/usr/lib/pythonstartup
 EOF
 
+ver="$(curl -skL https://api.github.com/repos/cirros-dev/cirros/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
+curl -skL -o ${mount_dir}/root/cirros-"$ver"-x86_64-disk.img https://github.com/cirros-dev/cirros/releases/download/"$ver"/cirros-"$ver"-x86_64-disk.img
+file=$(curl -skL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml | awk '/file: alpine-virt/ {print $2}')
+curl -skL -o ${mount_dir}/var/lib/vz/template/iso/${file} https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/${file}
+
 sed -i '/example/d' ${mount_dir}/etc/hosts
+rm -rf ${mount_dir}/var/lib/pve-cluster/*
 
 echo clean ...
 rm -rf ${mount_dir}/etc/hostname \
@@ -240,7 +247,6 @@ drivers/w1
 drivers/hwmon
 drivers/dax
 drivers/ssb
-drivers/gpu
 drivers/bluetooth
 drivers/video
 drivers/android
