@@ -227,7 +227,6 @@ net/ax25
 net/bluetooth
 net/ife
 net/phonet
-drivers/media
 drivers/mfd
 drivers/hid
 drivers/nfc
