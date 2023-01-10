@@ -40,6 +40,7 @@ ln -sf /dev/null ${mount_dir}/etc/systemd/system/cron.service
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
 
 sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
+sed -i 's/timeout=.*/timeout=0/g' ${mount_dir}/boot/grub/grub.cfg
 
 rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
@@ -153,8 +154,10 @@ EOF
 
 ver="$(curl -skL https://api.github.com/repos/cirros-dev/cirros/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
 curl -skL -o ${mount_dir}/root/cirros-"$ver"-x86_64-disk.img https://github.com/cirros-dev/cirros/releases/download/"$ver"/cirros-"$ver"-x86_64-disk.img
-file=$(curl -skL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml | awk '/file: alpine-virt/ {print $2}')
-curl -skL -o ${mount_dir}/var/lib/vz/template/iso/${file} https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/${file}
+#file=$(curl -skL https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/latest-releases.yaml | awk '/file: alpine-virt/ {print $2}')
+#curl -skL -o ${mount_dir}/var/lib/vz/template/iso/${file} https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/${file}
+ctfile=$(curl -skL http://download.proxmox.com/images/aplinfo-pve-${PVEVER%%.*}.dat | awk '/system\/alpine-/ {SAVE=$2} END{print SAVE}')
+curl -skL -o ${mount_dir}/var/lib/vz/template/cache/${ctfile##*/} http://download.proxmox.com/images/${ctfile}
 
 sed -i '/example/d' ${mount_dir}/etc/hosts
 rm -rf ${mount_dir}/var/lib/pve-cluster/*
@@ -247,7 +250,6 @@ drivers/hwmon
 drivers/dax
 drivers/ssb
 drivers/bluetooth
-drivers/video
 drivers/android
 drivers/nvme
 drivers/gnss
