@@ -35,17 +35,20 @@ ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily.timer
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_all.timer
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/apt-daily-upgrade.timer
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/fstrim.timer
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/pve-daily-update.timer
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/chrony.service
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/cron.service
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
+ln -sf /dev/null ${mount_dir}/etc/systemd/system/ceph-crash.service
 
 sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
-sed -i 's/timeout=.*/timeout=0/g' ${mount_dir}/boot/grub/grub.cfg
+sed -i -e 's/terminal_output gfxterm/terminal_output console/' -e 's/timeout=.*/timeout=0/g' ${mount_dir}/boot/grub/grub.cfg
 
 rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service \
-       ${mount_dir}/etc/systemd/system/pve-manager.service
+       ${mount_dir}/etc/systemd/system/pve-manager.service \
+       ${mount_dir}/etc/systemd/system/timers.target.wants/*
 
 sync ${mount_dir}
 umount ${mount_dir}
@@ -72,6 +75,10 @@ do
 done
 
 sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -l root 127.0.0.1 bash -sx << "CMD"
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt upgrade -y
+sleep 3
 /usr/bin/pmxcfs -l
 sleep 3
 echo y | /usr/bin/pveceph install
@@ -255,6 +262,10 @@ drivers/nvme
 drivers/gnss
 drivers/firewire
 drivers/leds
+drivers/media
+drivers/parport
+drivers/gpu
+drivers/video
 drivers/net/fddi
 drivers/net/hyperv
 drivers/net/xen-netback

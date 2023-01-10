@@ -12,7 +12,7 @@
 			"iso_checksum": "none",
 			"output_directory": "/tmp/output-pve",
 			"vm_name": "pve-XPVEVERX.raw",
-			"disk_size": "20480",
+			"disk_size": "102400",
 			"disk_compression": false,
 			"format": "raw",
 			"boot_wait": "10s",
