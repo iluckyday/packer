@@ -81,7 +81,7 @@ sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nu
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt upgrade -y
-apt install -y nfs-kernel-server
+apt install -y nfs-kernel-server samba
 sleep 3
 /usr/bin/pmxcfs -l
 sleep 3
