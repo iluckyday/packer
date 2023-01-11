@@ -48,6 +48,9 @@ rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/spiceproxy.service \
        ${mount_dir}/etc/systemd/system/pve-manager.service \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/postfix.service \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/chrony.service \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/cron.service \
        ${mount_dir}/etc/systemd/system/timers.target.wants/*
 
 sync ${mount_dir}
@@ -78,6 +81,7 @@ sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nu
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt upgrade -y
+apt install -y nfs-kernel-server
 sleep 3
 /usr/bin/pmxcfs -l
 sleep 3
