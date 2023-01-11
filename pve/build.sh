@@ -42,7 +42,7 @@ ln -sf /dev/null ${mount_dir}/etc/systemd/system/e2scrub_reap.service
 ln -sf /dev/null ${mount_dir}/etc/systemd/system/ceph-crash.service
 
 sed -i -e 's/ens[0-9]/ens10/g' -e 's/static/dhcp/' -e '/address/d' -e '/gateway/d' ${mount_dir}/etc/network/interfaces
-sed -i -e 's/terminal_output gfxterm/terminal_output console/' -e 's/timeout=.*/timeout=0/g' ${mount_dir}/boot/grub/grub.cfg
+#sed -i -e 's/terminal_output gfxterm/terminal_output console/' -e 's/timeout=.*/timeout=0/g' ${mount_dir}/boot/grub/grub.cfg
 
 rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/qmeventd.service \
@@ -82,6 +82,13 @@ sleep 3
 /usr/bin/pmxcfs -l
 sleep 3
 echo y | /usr/bin/pveceph install
+sleep 1
+cat << EOF > /etc/default/grub.d/custom.cfg
+GRUB_TIMEOUT=0
+GRUB_TERMINAL=console
+GRUB_DISABLE_RECOVERY=true
+EOF
+update-grub
 sleep 1
 poweroff
 CMD
