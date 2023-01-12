@@ -83,7 +83,7 @@ sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nu
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt upgrade -y
-apt install -y nfs-kernel-server samba glusterfs-server targetcli-fb suricata
+apt install -y nfs-kernel-server samba glusterfs-server targetcli-fb suricata openvswitch-switch
 sleep 3
 /usr/bin/pmxcfs -l
 sleep 3
@@ -258,7 +258,6 @@ drivers/firmware
 drivers/xen
 drivers/spi
 drivers/i2c
-drivers/uio
 drivers/hv
 drivers/ptp
 drivers/pcmcia
