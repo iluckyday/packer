@@ -51,6 +51,8 @@ rm -rf ${mount_dir}/etc/systemd/system/multi-user.target.wants/pve* \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/postfix.service \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/chrony.service \
        ${mount_dir}/etc/systemd/system/multi-user.target.wants/cron.service \
+       ${mount_dir}/etc/systemd/system/smartd.service \
+       ${mount_dir}/etc/systemd/system/multi-user.target.wants/smartmontools.service \
        ${mount_dir}/etc/systemd/system/timers.target.wants/*
 
 sync ${mount_dir}
@@ -81,7 +83,7 @@ sshpass -p proxmox ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nu
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt upgrade -y
-apt install -y nfs-kernel-server samba
+apt install -y nfs-kernel-server samba glusterfs-server targetcli-fb suricata
 sleep 3
 /usr/bin/pmxcfs -l
 sleep 3
@@ -204,7 +206,6 @@ fs/ocfs2
 fs/jfs
 fs/ubifs
 fs/gfs2
-fs/cifs
 fs/befs
 fs/erofs
 fs/hpfs
