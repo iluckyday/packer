@@ -16,9 +16,8 @@ jobs:
       - name: Build vyos.img
         run: sudo /bin/bash vyos/build.sh
 
-      - name: Push to transfer
-        env:
-          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
-          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: |
-          bash transfer.sh wet /tmp/output-vyos-rolling-amd64/vyos-*.img
+      - name: Upload iso artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: vyos-img
+          path: /tmp/output-vyos-rolling-amd64/vyos-*.img

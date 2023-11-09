@@ -16,9 +16,8 @@ jobs:
       - name: Build pbs.img
         run: sudo /bin/bash pbs/build.sh
 
-      - name: Push to transfer
-        env:
-          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
-          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: |
-          bash transfer.sh wet /tmp/output-pbs/pbs-*.img
+      - name: Upload iso artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: pbs-img
+          path: /tmp/output-pbs/pbs-*.img

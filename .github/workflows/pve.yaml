@@ -16,9 +16,8 @@ jobs:
       - name: Build pve.img
         run: sudo /bin/bash pve/build.sh
 
-      - name: Push to transfer
-        env:
-          WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
-          WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: |
-          bash transfer.sh wet /tmp/output-pve/pve-*.img
+      - name: Upload iso artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: pve-img
+          path: /tmp/output-pve/pve-*.img
