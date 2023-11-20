@@ -5,7 +5,7 @@
 			"memory": 2048,
 			"net_device": "ne2k_pci",
 			"headless": "true",
-			"iso_url": "https://s3-us.vyos.io/rolling/current/vyos-rolling-latest.iso",
+			"iso_url": "XURLX",
 			"iso_checksum": "none",
 			"output_directory": "/tmp/output-vyos-rolling-amd64",
 			"vm_name": "vyos-{{isotime `20060102`}}.img",
